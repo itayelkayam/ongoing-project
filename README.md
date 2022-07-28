@@ -2,7 +2,7 @@
 Itay's project
 
 Contains a "python.py" file running a web app using flask inside folder "flaskexample" 
-+ a Dockerfile with a python image to run the python code from.
+and a Dockerfile with a python image to run the python code from.
 
 an image built from this Dockerfile was uploaded to my private Amazon ECR (url available in Deployment.yaml image)
 
