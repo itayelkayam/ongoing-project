@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ongoing-project
+  namespace: ongprj
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx-one
+  rules:
+  - host: project.itayelk.website
+    http:
+      paths:
+      - path: /itay
+        pathType: Prefix
+        backend:
+          service:
+            name: ongoing-project
+            port:
+              name: http
