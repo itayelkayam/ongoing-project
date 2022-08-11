@@ -1,0 +1,23 @@
+1. Created a Jenkins Master running on docker in a ec2 instance, opening port 8080 to my IP on its security group.
+2. Created and connected a Jenkins Agent running on another ec2(with JDK & Docker Pre-installed using a custom AMI) using SSH username & password Credential in Jenkins, using the keypair made for this ec2 instance. labeled it 'ec2'
+
+3. Created a Pipeline that:
+* runs on agents labeled 'ec2'
+
+* Installs Dependencies - helm, microk8s, kubectl
+* configures microk8s
+
+* Checkout a git repository containing a Helm Chart for my Python web app project
+
+* Used With Credentials in Jenkins to create a secret template, containing credentials for ecr permissioned aws user.
+
+* Installed the helm chart using helm install 
+
+* Created a Network Load Balancer and a target group with the jenkins agent nginx ingress controller port exposed to port 80 on the service (ephemeral port)
+
+* Created a rule on the security group to allow all tcp traffic on that ephemeral port.
+
+* configured a DNS A Record in GoDaddy to redirect my website with subdomain 'project' (project.itayelk.website) to the Network Load Balancer IP
+
+* tried reaching the python website with the rules mentioned in the Ingress of the helm Chart Deployment (which is host: project.itayelk.website | prefix: /itay)
+	

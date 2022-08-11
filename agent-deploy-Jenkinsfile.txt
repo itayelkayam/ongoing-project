@@ -1,0 +1,51 @@
+pipeline {
+    agent {
+        label 'ec2'
+    }
+
+    stages {
+         stage('Dependencies') {
+            steps {
+                sh ''' sudo snap install microk8s --classic
+                sudo snap install kubectl --classic
+                sudo snap install helm --classic
+                '''
+            }
+         }
+        stage('check & kubeconfig') {
+            steps {
+                echo 'Hello World'
+                sh ''' export KUBECONFIG=$HOME/.kube/config
+                sudo microk8s config >/$HOME/.kube/config
+                kubectl get pods -A  '''
+            }
+        }
+         stage('Git') {
+            steps {
+                git 'https://github.com/itayelkayam/ongoing-project.git'
+            }
+         }
+         stage('Secret Writing') {
+            steps {
+                withCredentials([string(credentialsId: 'KEY', variable: 'KEY'), string(credentialsId: 'KEYID', variable: 'KEYID'), string(credentialsId: 'ACCOUNT', variable: 'ACCOUNT')]) {
+                sh '''echo "apiVersion: v1
+kind: Secret
+metadata:
+  name: ecr-registry-helper-secrets
+  namespace: ongprj
+stringData:
+  AWS_SECRET_ACCESS_KEY: ${KEY}
+  AWS_ACCESS_KEY_ID: ${KEYID}
+  AWS_ACCOUNT: ${ACCOUNT} " > flaskexample/helmsd/ongoing-project/templates/secret.yaml
+cat flaskexample/helmsd/ongoing-project/templates/secret.yaml'''
+            }
+        }
+    }
+        stage('build Helm'){
+            steps {
+            sh ''' helm install ongprj flaskexample/helmsd/ongoing-project/ '''
+            }
+        }
+  }
+}
+
