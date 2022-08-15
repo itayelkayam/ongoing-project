@@ -5,7 +5,10 @@
 * runs on agents labeled 'ec2'
 
 * Installs Dependencies - helm, microk8s, kubectl
-* configures microk8s
+
+* configures microk8s, enables dns & hostpath-storage & creates project namespace
+
+* installs nginx ingress controller
 
 * Checkout a git repository containing a Helm Chart for my Python web app project
 

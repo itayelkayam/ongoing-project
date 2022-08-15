@@ -15,11 +15,27 @@ pipeline {
         stage('check & kubeconfig') {
             steps {
                 echo 'Hello World'
-                sh ''' export KUBECONFIG=$HOME/.kube/config
+                sh ''' mkdir $HOME/.kube
+                export KUBECONFIG=$HOME/.kube/config
                 sudo microk8s config >/$HOME/.kube/config
-                kubectl get pods -A  '''
+                kubectl get pods -A  
+                sudo microk8s enable hostpath-storage dns
+                kubectl create ns ongprj '''
             }
         }
+        stage('Installing ingress-controller') {
+          steps {
+          sh ''' kubectl create namespace ingress-nginx-1
+          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+          helm repo update
+          helm install ingress-nginx-1 ingress-nginx/ingress-nginx  \
+	  --namespace ingress-nginx-1 \
+	  --set controller.ingressClassResource.name=nginx-one \
+	  --set controller.ingressClassResource.controllerValue="example.com/ingress-nginx-1" \
+	  --set controller.ingressClassResource.enabled=true \
+	  --set controller.ingressClassByName=true '''
+	  }
+	}
          stage('Git') {
             steps {
                 git 'https://github.com/itayelkayam/ongoing-project.git'
